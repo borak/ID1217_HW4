@@ -1,3 +1,5 @@
+package id1217_hw4;
+
 
 import java.util.Random;
 
@@ -11,17 +13,17 @@ import java.util.Random;
  *
  * @author Kim
  */
-public class Vehicle extends Thread implements Runnable {
+public class VehicleThread extends Thread implements Runnable {
 
     public enum Type {
         A, B, C;
     }
     private Type type;
     private long id;
-    private VehicleRepairStation station;
+    private VehicleRepairStationMonitor station;
     private static final int DRIVING_TIME_MAX = 10*1000;
     
-    public Vehicle(Type type, int id, VehicleRepairStation station) {
+    public VehicleThread(Type type, int id, VehicleRepairStationMonitor station) {
         this.type = type;
         this.id = id;
         this.station = station;
@@ -30,9 +32,10 @@ public class Vehicle extends Thread implements Runnable {
     @Override
     public void run() {
         Random rand = new Random();
+        long drivingTime;
         
         while(true) {
-            long drivingTime = rand.nextInt(DRIVING_TIME_MAX);
+            drivingTime = rand.nextInt(DRIVING_TIME_MAX);
 
             try {
                 this.sleep(drivingTime);
