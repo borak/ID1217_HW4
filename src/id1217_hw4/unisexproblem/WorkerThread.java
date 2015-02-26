@@ -11,12 +11,12 @@ public class WorkerThread extends Thread implements Runnable {
     public enum Gender {
         MALE, FEMALE;
     }
-    private final Bathroom bathroom;
+    private final BathroomMonitor bathroom;
     private final int id;
     private final Gender gender;
     private final static int WORK_TIME = 30 * 1000;
     
-    public WorkerThread(int id, Gender gender, Bathroom bathroom) {
+    public WorkerThread(int id, Gender gender, BathroomMonitor bathroom) {
         super();
         this.bathroom = bathroom;
         this.id = id;
@@ -32,9 +32,13 @@ public class WorkerThread extends Thread implements Runnable {
 
             try {
                 this.sleep(workTime);
-                bathroom.enter(this);
-                bathroom.use(this);
-                bathroom.leave(this);
+                if(gender == Gender.MALE) {
+                    bathroom.manEnter();
+                    bathroom.manExit();
+                } else {
+                    bathroom.womanEnter();
+                    bathroom.womanExit();
+                }
             } catch (InterruptedException ex) {
                 System.err.println(getGender() + "[" + getId() + ": " + ex.getMessage());
             }

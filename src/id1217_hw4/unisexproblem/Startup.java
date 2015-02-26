@@ -3,14 +3,14 @@ package id1217_hw4.unisexproblem;
 import java.util.Random;
 
 /**
- * This application is a solution to the unisex bathroom problem using only 
- * semaphores for synchronization.
+ * This application is a solution to the unisex bathroom problem using a monitor
+ * for synchronization.
  * This class will start the workers and they will all have access to the same 
- * bathroom.
+ * bathroom by going via the monitor.
  * 
  * @author Kim
  */
-public class ID1217_HW3Startup {
+public class Startup {
 
     public static final int NUMBER_OF_WORKERS_MAXIMUM = 100;
     public static final int NUMBER_OF_WORKERS_DEFAULT = 10;
@@ -42,7 +42,7 @@ public class ID1217_HW3Startup {
             numberOfWorkers = NUMBER_OF_WORKERS_DEFAULT;;
         }
         
-        Bathroom bathroom = new Bathroom();
+        BathroomMonitor bathroom = new BathroomMonitor(new Bathroom());
 
         Random rand = new Random();
         for(int i = 0; i < numberOfWorkers; i++) {
