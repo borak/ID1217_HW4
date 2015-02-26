@@ -1,121 +1,105 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package id1217_hw4.unisexproblem;
 
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- *
+ * This class will act as a monitor for the access to the specified Bathroom.
+ * It will use condition variables for synchronization in a Signal and Continue 
+ * way.
  * @author Kim
  */
 public class BathroomMonitor {
 
     private final Lock lock = new ReentrantLock();
-    private final Condition nonActiveMen  = lock.newCondition(); 
-    private final Condition nonActiveWomen = lock.newCondition();
-
-    private final ReentrantReadWriteLock menLock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock womenLock = new ReentrantReadWriteLock();
+    private final Condition activeMen  = lock.newCondition(); 
+    private final Condition activeWomen = lock.newCondition();
     private final Bathroom bathroom;
-    private int activeWomen = 0;
-    private int activeMen = 0;
+    private int numberOfActiveWomen = 0;
+    private int numberOfActiveMen = 0;
 
+    /**
+     * Sets the bathroom object.
+     * @param bathroom The bathroom to let the entering people use.
+     */
     public BathroomMonitor(Bathroom bathroom) {
+        if(bathroom == null) 
+            throw new IllegalArgumentException("Can not set a bathroom which is null");
         this.bathroom = bathroom;
     }
     
+    /**
+     * This method will use the bathroom directly if no women are waiting or,
+     * if there are women waiting, wait until they are done.
+     */
     public void manEnter() {
-        womenLock.readLock().lock();
+        lock.lock();
         try {
-            while(activeWomen > 0) {
-                womenLock.readLock().unlock();
-                try {
-                    nonActiveWomen.await();
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                womenLock.readLock().lock();
-            }
+          while (numberOfActiveWomen > 0) {
+              try {
+                  activeWomen.await();
+              } catch (InterruptedException ex) {
+                  System.err.println("Man interrupted while waiting for bathroom");
+              }
+          }
+          
+          numberOfActiveMen++;
+          bathroom.use();
         } finally {
-            womenLock.readLock().tryLock();
-            womenLock.readLock().unlock();
+          lock.unlock();
         }
-        
-        menLock.writeLock().lock();
-        try {
-            activeMen++;
-        } finally {
-            menLock.writeLock().unlock();
-        }
-        bathroom.use();
     }
     
+    /**
+     * Notifies that the man is done.
+     * If it's the last man, notify all men.
+     */
     public void manExit() {
-        menLock.writeLock().lock();
+        lock.lock();
         try {
-            activeMen--;
+            numberOfActiveMen--;
+            if(numberOfActiveMen == 0) 
+                activeMen.signalAll();
         } finally {
-            menLock.writeLock().unlock();
-        }
-        
-        menLock.readLock().lock();
-        try {
-            if(activeMen == 0) {
-                nonActiveWomen.signalAll();
-            }
-        } finally {
-            menLock.readLock().unlock();
+          lock.unlock();
         }
     }
-    
+ 
+    /**
+     * This method will use the bathroom directly if no men are waiting or,
+     * if there are men waiting, wait until they are done.
+     */
     public void womanEnter() {
-        menLock.readLock().lock();
+       lock.lock();
         try {
-            while(activeMen > 0) {
-                menLock.readLock().unlock();
-                try {
-                    nonActiveMen.await();
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
-                menLock.readLock().lock();
-            }
+          while (numberOfActiveMen > 0) {
+              try {
+                  activeMen.await();
+              } catch (InterruptedException ex) {
+                  System.err.println("Woman interrupted while waiting for bathroom");
+              }
+          }
+          
+          numberOfActiveWomen++;
+          bathroom.use();
         } finally {
-            menLock.readLock().tryLock();
-            menLock.readLock().unlock();
+          lock.unlock();
         }
-        
-        womenLock.writeLock().lock();
-        try {
-            activeWomen++;
-        } finally {
-            womenLock.writeLock().unlock();
-        }
-        bathroom.use();
     }
     
+    /**
+     * Notifies that the woman is done.
+     * If it's the last woman, notify all men.
+     */
     public void womanExit() {
-        womenLock.writeLock().lock();
+        lock.lock();
         try {
-            activeWomen--;
+            numberOfActiveWomen--;
+            if(numberOfActiveWomen == 0) 
+                activeWomen.signalAll();
         } finally {
-            womenLock.writeLock().unlock();
-        }
-        womenLock.readLock().lock();
-        try {
-            if(activeWomen == 0) {
-                nonActiveMen.signalAll();
-            }
-        } finally {
-            womenLock.readLock().unlock();
+          lock.unlock();
         }
     }
 }

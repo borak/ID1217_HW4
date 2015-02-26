@@ -3,20 +3,28 @@ package id1217_hw4.unisexproblem;
 import java.util.Random;
 
 /**
- * Developed for course ID1217 Parallel Programming, KTH
- * 
+ * This class represents a bathroom which you can use.
  * @author Kim
  */
 public class Bathroom {
 
-    private static final int USE_TIME_DEFAULT = 10* 1000;
+    private static final int USE_TIME_DEFAULT = 3 * 1000;
     private final int USE_TIME;
     
+    /**
+     * Sets the simulated bathroom use time maxium to default (USE_TIME_DEFAULT).
+     */
     public Bathroom() {
         this(USE_TIME_DEFAULT);
     }
     
+    /**
+     * Sets the simulated use time to the specified parameter.
+     * @param useTime The maximum time which a thread will use the bathroom. 
+     */
     public Bathroom(int useTime) {
+        if(useTime < 0) throw new IllegalArgumentException("Can not set a "
+                + "negative bathroom use time.");
         USE_TIME = useTime;
     }
 
@@ -34,6 +42,5 @@ public class Bathroom {
             System.err.println("Bathroom usage has been interrupted.");
         }
     }
-
 
 }
