@@ -1,4 +1,4 @@
-package id1217_hw4;
+package id1217_hw4.repairstation;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -10,6 +10,6 @@ package id1217_hw4;
  *
  * @author Kim
  */
-public class VehicleC {
+public class VehicleB {
     
 }

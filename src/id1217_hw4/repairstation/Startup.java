@@ -1,4 +1,4 @@
-package id1217_hw4;
+package id1217_hw4.repairstation;
 
 import java.util.Random;
 

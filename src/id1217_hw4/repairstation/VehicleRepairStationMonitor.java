@@ -1,4 +1,4 @@
-package id1217_hw4;
+package id1217_hw4.repairstation;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -17,8 +17,10 @@ import java.util.Random;
 public class VehicleRepairStationMonitor {
     
     private static final int REPAIR_MAX_TIME = 10*1000;
+ 
     
     public void repair(VehicleThread v) {
+        
         Random rand = new Random();
         int time = rand.nextInt(REPAIR_MAX_TIME);
 
